@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>대한민국 구석구석 - 나만의 여행지 보관함</title>
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --heart: #ef4444;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 1rem 1.5rem;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .btn-favorite-box {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-favorite-box:hover {
+      background: #e2e8f0;
+    }
+
+    .badge {
+      background: var(--heart);
+      color: white;
+      border-radius: 9999px;
+      padding: 0.1rem 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1200px;
+      margin: 1.5rem auto;
+      padding: 0 1rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* Filters */
+    .filter-section {
+      background: white;
+      padding: 1.25rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .area-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .area-btn {
+      padding: 0.5rem 0.9rem;
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.875rem;
+      transition: all 0.2s;
+    }
+
+    .area-btn.active, .area-btn:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* Tour Cards Grid */
+    .tour-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .tour-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+
+    .tour-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .card-img-wrapper {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background: #f1f5f9;
+    }
+
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-like-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.85);
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+      font-size: 1.1rem;
+      color: #94a3b8;
+    }
+
+    .card-like-btn.liked {
+      color: var(--heart);
+    }
+
+    .card-like-btn:hover {
+      transform: scale(1.15);
+      background: white;
+    }
+
+    .card-body {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-addr {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Status Messages & Spinners */
+    .loading-state, .empty-state {
+      text-align: center;
+      padding: 3rem 0;
+      grid-column: 1 / -1;
+      color: var(--text-muted);
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Modal (찜 보관함) */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 650px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 1.2rem;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    .modal-body {
+      padding: 1rem 1.5rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .bookmark-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .bookmark-item:last-child {
+      border-bottom: none;
+    }
+
+    .bookmark-item img {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #f1f5f9;
+    }
+
+    .bookmark-info {
+      flex: 1;
+    }
+
+    .bookmark-info h4 {
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .bookmark-info p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .bookmark-delete-btn {
+      background: none;
+      border: none;
+      color: var(--heart);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.5rem;
+    }
+  </style>
+
+  <!-- Firebase Modular SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      collection, 
+      doc, 
+      setDoc, 
+      deleteDoc, 
+      onSnapshot 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // ==========================================
+    // 1. Firebase 및 API 환경설정 (키 교체 필요)
+    // ==========================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyBXugQIZBQDh_R6_IKfSsk8Qre9kHJB7B8",
+      authDomain: "my-project-e3104.firebaseapp.com",
+      projectId: "my-project-e3104",
+      storageBucket: "my-project-e3104.firebasestorage.app",
+      messagingSenderId: "824249211212",
+      appId: "1:824249211212:web:420a6d1f63bd8ce9e6d7e9"
+    };
+
+    // 한국관광공사 TourAPI 서비스키 (Encoding 또는 일반 인증키)
+    const TOUR_API_KEY = "b45e02c4dfb2b0d18fee5d4bbbca349b9b6f6f70ab819215d9cfe6184588e94a";
+
+    // Firebase 초기화
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ==========================================
+    // 2. 상태 관리
+    // ==========================================
+    let currentUser = null;
+    let bookmarks = new Map(); // contentid -> 관광지 객체 매핑
+    let currentTourList = [];
+
+    // ==========================================
+    // 3. UI 컴포넌트 셀렉터
+    // ==========================================
+    const tourListEl = document.getElementById("tourList");
+    const favoriteCountEl = document.getElementById("favCount");
+    const modalOverlay = document.getElementById("modalOverlay");
+    const openModalBtn = document.getElementById("openModalBtn");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const bookmarkListEl = document.getElementById("bookmarkList");
+    const areaButtonsContainer = document.getElementById("areaButtons");
+
+    // ==========================================
+    // 4. 익명 인증 및 Firestore 실시간 동기화
+    // ==========================================
+    signInAnonymously(auth).catch((error) => {
+      console.error("Firebase 익명 로그인 실패:", error);
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+        listenToBookmarks(user.uid);
+      }
+    });
+
+    // Firestore에서 사용자별 찜 목록 실시간 수신
+    function listenToBookmarks(uid) {
+      const userBookmarksRef = collection(db, "users", uid, "bookmarks");
+      onSnapshot(userBookmarksRef, (snapshot) => {
+        bookmarks.clear();
+        snapshot.forEach((docSnap) => {
+          bookmarks.set(docSnap.id, docSnap.data());
+        });
+        updateBookmarkUI();
+        renderTourList(currentTourList); // 리스트 내 하트 상태 동기화
+      });
+    }
+
+    // 찜하기 토글 (추가/삭제)
+    async function toggleBookmark(item) {
+      if (!currentUser) {
+        alert("인증 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
+        return;
+      }
+      const itemRef = doc(db, "users", currentUser.uid, "bookmarks", String(item.contentid));
+      try {
+        if (bookmarks.has(String(item.contentid))) {
+          await deleteDoc(itemRef);
+        } else {
+          await setDoc(itemRef, {
+            contentid: item.contentid,
+            title: item.title,
+            addr1: item.addr1 || "주소 정보 없음",
+            firstimage: item.firstimage || item.firstimage2 || "",
+            savedAt: new Date().toISOString()
+          });
+        }
+      } catch (err) {
+        console.error("Firebase 동기화 실패:", err);
+        alert("찜 상태 업데이트 중 문제가 발생했습니다.");
+      }
+    }
+
+    // ==========================================
+    // 5. 공공데이터 API 연동 (TourAPI 4.0)
+    // ==========================================
+    const REGIONS = [
+      { code: "1", name: "서울" },
+      { code: "6", name: "부산" },
+      { code: "39", name: "제주" },
+      { code: "31", name: "경기" },
+      { code: "32", name: "강원" },
+      { code: "35", name: "경북" },
+      { code: "38", name: "전남" }
+    ];
+
+    // 지역 선택 버튼 생성
+    function renderRegionButtons() {
+      areaButtonsContainer.innerHTML = REGIONS.map((r, idx) => `
+        <button class="area-btn ${idx === 0 ? 'active' : ''}" data-code="${r.code}">
+          ${r.name}
+        </button>
+      `).join("");
+
+      areaButtonsContainer.querySelectorAll(".area-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          areaButtonsContainer.querySelectorAll(".area-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          fetchTourData(btn.dataset.code);
+        });
+      });
+    }
+
+    // 한국관광공사 국문 관광정보 서비스 - 지역기반 관광정보조회 (areaBasedList1)
+    async function fetchTourData(areaCode = "1") {
+      tourListEl.innerHTML = `
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>관광지 정보를 불러오는 중입니다...</p>
+        </div>
+      `;
+
+      // 서비스키 특수문자 디코딩 처리 방지
+      const serviceKey = decodeURIComponent(TOUR_API_KEY);
+      const url = new URL("https://apis.data.go.kr/B551011/KorService1/areaBasedList1");
+      url.search = new URLSearchParams({
+        serviceKey: serviceKey,
+        numOfRows: "16",
+        pageNo: "1",
+        MobileOS: "ETC",
+        MobileApp: "TourApp",
+        _type: "json",
+        areaCode: areaCode,
+        arrange: "O" // 제목순 정렬
+      }).toString();
+
+      try {
+        const res = await fetch(url.toString());
+        if (!res.ok) throw new Error("API 응답 오류");
+        const data = await res.json();
+        
+        const items = data?.response?.body?.items?.item || [];
+        currentTourList = Array.isArray(items) ? items : (items ? [items] : []);
+        renderTourList(currentTourList);
+      } catch (err) {
+        console.error("데이터 로드 실패:", err);
+        tourListEl.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size:2rem; margin-bottom:1rem; color:#f87171;"></i>
+            <p>관광지 데이터를 불러오지 못했습니다.<br>서비스키 또는 네트워크 연결을 확인해주세요.</p>
+          </div>
+        `;
+      }
+    }
+
+    // 관광지 목록 렌더링
+    function renderTourList(items) {
+      if (!items || items.length === 0) {
+        tourListEl.innerHTML = `<div class="empty-state"><p>조회된 관광지가 없습니다.</p></div>`;
+        return;
+      }
+
+      tourListEl.innerHTML = items.map(item => {
+        const isLiked = bookmarks.has(String(item.contentid));
+        const imgUrl = item.firstimage || item.firstimage2 || "https://images.unsplash.com/photo-1517824806704-9040b037703b?w=500&auto=format&fit=crop&q=60";
+        return `
+          <div class="tour-card" data-id="${item.contentid}">
+            <div class="card-img-wrapper">
+              <img class="card-img" src="${imgUrl}" alt="${item.title}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1517824806704-9040b037703b?w=500&auto=format&fit=crop&q=60';">
+              <button class="card-like-btn ${isLiked ? 'liked' : ''}" data-id="${item.contentid}" title="찜하기">
+                <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+              </button>
+            </div>
+            <div class="card-body">
+              <h3 class="card-title">${item.title}</h3>
+              <p class="card-addr">${item.addr1 || "상세 주소 정보가 없습니다."}</p>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      // 찜하기 버튼 클릭 이벤트 위임
+      tourListEl.querySelectorAll(".card-like-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const targetId = btn.dataset.id;
+          const targetItem = currentTourList.find(i => String(i.contentid) === String(targetId));
+          if (targetItem) toggleBookmark(targetItem);
+        });
+      });
+    }
+
+    // 보관함 모달 UI 업데이트
+    function updateBookmarkUI() {
+      favoriteCountEl.textContent = bookmarks.size;
+
+      if (bookmarks.size === 0) {
+        bookmarkListEl.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding: 2rem 0;">보관된 관광지가 없습니다.</p>`;
+        return;
+      }
+
+      bookmarkListEl.innerHTML = Array.from(bookmarks.values()).map(item => `
+        <div class="bookmark-item">
+          <img src="${item.firstimage || 'https://images.unsplash.com/photo-1517824806704-9040b037703b?w=100&auto=format&fit=crop&q=60'}" alt="${item.title}">
+          <div class="bookmark-info">
+            <h4>${item.title}</h4>
+            <p>${item.addr1}</p>
+          </div>
+          <button class="bookmark-delete-btn" data-id="${item.contentid}" title="보관함에서 삭제">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
+      `).join("");
+
+      bookmarkListEl.querySelectorAll(".bookmark-delete-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.dataset.id;
+          toggleBookmark({ contentid: id });
+        });
+      });
+    }
+
+    // Modal Control
+    openModalBtn.addEventListener("click", () => modalOverlay.classList.add("active"));
+    closeModalBtn.addEventListener("click", () => modalOverlay.classList.remove("active"));
+    modalOverlay.addEventListener("click", (e) => {
+      if (e.target === modalOverlay) modalOverlay.classList.remove("active");
+    });
+
+    // 시작
+    renderRegionButtons();
+    fetchTourData("1"); // 서울 기본 로드
+  </script>
+</head>
+<body>
+
+  <header>
+    <div class="nav-container">
+      <div class="logo">
+        <i class="fa-solid fa-map-location-dot"></i>
+        <span>대한민국 방방곡곡</span>
+      </div>
+      <button class="btn-favorite-box" id="openModalBtn">
+        <i class="fa-solid fa-heart" style="color: var(--heart);"></i>
+        <span>찜 보관함</span>
+        <span class="badge" id="favCount">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="filter-section">
+      <div style="font-weight:700; font-size:0.95rem;">지역 선택:</div>
+      <div class="area-buttons" id="areaButtons"></div>
+    </section>
+
+    <!-- 관광지 카드 그리드 -->
+    <div class="tour-grid" id="tourList"></div>
+  </main>
+
+  <!-- 찜 보관함 모달 -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-bookmark" style="color: var(--primary); margin-right: 8px;"></i>내 찜 보관함</h3>
+        <button class="modal-close" id="closeModalBtn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="bookmarkList"></div>
+    </div>
+  </div>
+
+</body>
+</html>
